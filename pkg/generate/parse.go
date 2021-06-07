@@ -503,7 +503,7 @@ func (b *APIsBuilder) ParsePackages() {
 					"Found multiple apis directory paths: %v and %v.  "+
 						"Do you have a +resource tag on a resource that is not in a version "+
 						"directory?", b.APIsPkg, apis))
-			} else {
+			} else if len(apis) != 0 {
 				b.APIsPkg = apis
 			}
 		}

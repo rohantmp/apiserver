@@ -1,7 +1,6 @@
 package v1
 
 import (
-	rbacv1 "k8s.io/api/rbac/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -24,13 +23,7 @@ type ClusterRole struct {
 type ClusterRoleSpec struct {
 	// Rules holds all the PolicyRules for this ClusterRole
 	// +optional
-	Rules []rbacv1.PolicyRule `json:"rules"`
-
-	// AggregationRule is an optional field that describes how to build the Rules for this ClusterRole.
-	// If AggregationRule is set, then the Rules are controller managed and direct changes to Rules will be
-	// stomped by the controller.
-	// +optional
-	AggregationRule *rbacv1.AggregationRule `json:"aggregationRule,omitempty"`
+	Rules []string `json:"rules"`
 }
 
 // ClusterRoleStatus holds the user status
