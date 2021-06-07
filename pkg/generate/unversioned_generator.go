@@ -74,7 +74,7 @@ var (
 			New{{ $api.REST }},
 		)
 		New{{ $api.REST }} = func(getter generic.RESTOptionsGetter) rest.Storage {
-			return New{{ $api.REST }}Func(Factory)
+			return New{{ $api.REST }}Func()
 		}
 		New{{ $api.REST }}Func NewRESTFunc
 	{{ else -}}

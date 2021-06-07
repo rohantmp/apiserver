@@ -19,19 +19,21 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
-	"k8s.io/apimachinery/pkg/version"
 	genericapiserver "k8s.io/apiserver/pkg/server"
 )
 
-type Installer struct {
-	Scheme *runtime.Scheme
+// Server contains state for a Kubernetes cluster master/api server.
+type Server struct {
+	GenericAPIServer *genericapiserver.GenericAPIServer
 }
 
-func (c *Config) Init() *Config {
+// NewServer returns a new instance of Server from the given config.
+func NewServer(recommendedConfig *genericapiserver.RecommendedConfig, apis []*builders.APIGroupBuilder) (*Server, error) {
 	localSchemeBuilder := runtime.NewSchemeBuilder()
-	for _, groupBuilder := range builders.APIGroupBuilders {
+	for _, groupBuilder := range apis {
 		localSchemeBuilder.Register(groupBuilder.AddToScheme)
 	}
+
 	utilruntime.Must(localSchemeBuilder.AddToScheme(builders.Scheme))
 
 	// we need to add the options to empty v1
@@ -48,67 +50,21 @@ func (c *Config) Init() *Config {
 		&metav1.APIResourceList{},
 	)
 
-	// initialize admission controllers
-
-	return c
-}
-
-type Config struct {
-	RecommendedConfig   *genericapiserver.RecommendedConfig
-	InsecureServingInfo *genericapiserver.DeprecatedInsecureServingInfo
-
-	PostStartHooks map[string]genericapiserver.PostStartHookFunc
-}
-
-// Server contains state for a Kubernetes cluster master/api server.
-type Server struct {
-	GenericAPIServer *genericapiserver.GenericAPIServer
-}
-
-type completedConfig struct {
-	*Config
-}
-
-// Complete fills in any fields not set that are required to have valid data. It's mutating the receiver.
-func (c *Config) Complete() completedConfig {
-	c.RecommendedConfig.Config.Version = &version.Info{
-		Major: "1",
-		Minor: "0",
-	}
-	return completedConfig{c}
-}
-
-func (c *Config) AddApi(builder *builders.APIGroupBuilder) *Config {
-	builders.APIGroupBuilders = append(builders.APIGroupBuilders, builder)
-	return c
-}
-
-// SkipComplete provides a way to construct a server instance without config completion.
-func (c *Config) SkipComplete() completedConfig {
-	return completedConfig{c}
-}
-
-// NewFunc returns a new instance of Server from the given config.
-func (c completedConfig) New() (*Server, error) {
-	genericServer, err := c.Config.RecommendedConfig.Config.Complete(c.RecommendedConfig.SharedInformerFactory).
+	genericServer, err := recommendedConfig.Config.Complete(recommendedConfig.SharedInformerFactory).
 		New("aggregated-apiserver", genericapiserver.NewEmptyDelegate()) // completion is done in Complete, no need for a second time
 	if err != nil {
 		return nil, err
 	}
 
-	for hookName, hook := range c.PostStartHooks {
-		genericServer.AddPostStartHookOrDie(hookName, hook)
-	}
-
 	s := &Server{
 		GenericAPIServer: genericServer,
 	}
-
-	for _, builder := range builders.APIGroupBuilders {
-		group := builder.Build(c.RecommendedConfig.Config.RESTOptionsGetter)
+	for _, builder := range apis {
+		group := builder.Build(recommendedConfig.Config.RESTOptionsGetter)
 		if err := s.GenericAPIServer.InstallAPIGroup(group); err != nil {
 			return nil, err
 		}
 	}
+
 	return s, nil
 }

@@ -21,9 +21,6 @@ import (
 	genericapiserver "k8s.io/apiserver/pkg/server"
 )
 
-// Global registry of API groups
-var APIGroupBuilders = []*APIGroupBuilder{}
-
 type APIGroupBuilder struct {
 	UnVersioned     *UnVersionedApiBuilder
 	Versions        []*VersionedApiBuilder
@@ -101,12 +98,9 @@ func (g *APIGroupBuilder) Build(optionsGetter generic.RESTOptionsGetter) *generi
 		Codecs)
 
 	g.registerEndpoints(optionsGetter, i.VersionedResourcesStorageMap)
-
 	return &i
-
 }
 
-// Deprecated
 func (g *APIGroupBuilder) AddToScheme(scheme *runtime.Scheme) error {
 	localSchemeBuilder := runtime.NewSchemeBuilder(g.registerVersionPriorities)
 	for _, versionBuilder := range g.Versions {

@@ -25,7 +25,7 @@ var (
 		NewClusterRoleREST,
 	)
 	NewClusterRoleREST = func(getter generic.RESTOptionsGetter) rest.Storage {
-		return NewClusterRoleRESTFunc(Factory)
+		return NewClusterRoleRESTFunc()
 	}
 	NewClusterRoleRESTFunc NewRESTFunc
 	InternalClusterRole    = builders.NewInternalResource(
