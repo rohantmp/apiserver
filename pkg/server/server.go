@@ -78,16 +78,7 @@ func newAPIServerCommand(opts *StartOptions, stopChan <-chan struct{}) (*cobra.C
 		Short: "Launch an API server",
 		Long:  "Launch an API server",
 		RunE: func(c *cobra.Command, args []string) error {
-			if err := o.Complete(); err != nil {
-				return err
-			}
-			if err := o.Validate(args); err != nil {
-				return err
-			}
-			if err := o.RunServer(opts.Version, stopChan, opts.Authorizer, opts.TweakServerConfig); err != nil {
-				return err
-			}
-			return nil
+			return o.RunServer(opts.Version, stopChan, opts.Authorizer, opts.TweakServerConfig)
 		},
 	}
 

@@ -1,7 +1,6 @@
 package apiserver
 
 import (
-	"bytes"
 	"crypto/tls"
 	"fmt"
 	"github.com/loft-sh/apiserver/pkg/admission"
@@ -34,14 +33,6 @@ type ServerOptions struct {
 
 	GetOpenAPIDefinitions openapi.GetOpenAPIDefinitions
 	DisableWebhooks       bool
-}
-
-func (o *ServerOptions) Validate(args []string) error {
-	return nil
-}
-
-func (o *ServerOptions) Complete() error {
-	return nil
 }
 
 func (o *ServerOptions) GenericConfig(tweakConfig func(config *genericapiserver.RecommendedConfig) error) (*genericapiserver.RecommendedConfig, error) {
@@ -171,13 +162,6 @@ func (o *ServerOptions) buildLoopback() (*rest.Config, informers.SharedInformerF
 	kubeInformerFactory := informers.NewSharedInformerFactory(loopbackClient, 0)
 	return loopbackConfig, kubeInformerFactory, nil
 }
-
-type BufferedResponse struct {
-	bytes.Buffer
-}
-
-func (BufferedResponse) Header() http.Header { return http.Header{} }
-func (BufferedResponse) WriteHeader(int)     {}
 
 func createNodeDialer() *http.Transport {
 	// Setup nodeTunneler if needed
