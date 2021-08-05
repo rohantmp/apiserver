@@ -69,8 +69,7 @@ func IsUnversioned(t *types.Type, group string) bool {
 }
 
 func IsVersioned(t *types.Type, group string) bool {
-	dir := filepath.Base(filepath.Dir(filepath.Dir(t.Name.Package)))
-	return IsApisDir(dir) && GetGroup(t) == group
+	return GetGroup(t) == group
 }
 
 func GetVersion(t *types.Type, group string) string {
