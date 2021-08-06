@@ -20,6 +20,8 @@ type CustomArgs struct{}
 
 type Gen struct {
 	p []generator.Package
+
+	GroupConverter func(apigroup *APIGroup)
 }
 
 func (g *Gen) Execute(arguments *args.GeneratorArgs) error {
@@ -77,6 +79,10 @@ func (g *Gen) Packages(context *generator.Context, arguments *args.GeneratorArgs
 
 	b := NewAPIsBuilder(context, arguments)
 	for _, apigroup := range b.APIs.Groups {
+		if g.GroupConverter != nil {
+			g.GroupConverter(apigroup)
+		}
+
 		for _, apiversion := range apigroup.Versions {
 			factory := &packageFactory{apiversion.Pkg.Path, arguments, boilerplate}
 			// Add generators for versioned types
