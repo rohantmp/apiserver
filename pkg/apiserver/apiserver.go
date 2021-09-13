@@ -18,6 +18,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/apimachinery/pkg/runtime/serializer"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	genericapiserver "k8s.io/apiserver/pkg/server"
 )
@@ -61,10 +62,53 @@ func NewServer(recommendedConfig *genericapiserver.RecommendedConfig, apis []*bu
 	}
 	for _, builder := range apis {
 		group := builder.Build(recommendedConfig.Config.RESTOptionsGetter)
+		group.NegotiatedSerializer = newProtocolShieldSerializers(&builders.Codecs)
 		if err := s.GenericAPIServer.InstallAPIGroup(group); err != nil {
 			return nil, err
 		}
 	}
 
 	return s, nil
+}
+
+type protocolShieldSerializers struct {
+	*serializer.CodecFactory
+	accepts []runtime.SerializerInfo
+}
+
+func newProtocolShieldSerializers(codecs *serializer.CodecFactory) *protocolShieldSerializers {
+	if codecs == nil {
+		return nil
+	}
+	pss := &protocolShieldSerializers{
+		CodecFactory: codecs,
+		accepts:      []runtime.SerializerInfo{},
+	}
+	for _, info := range codecs.SupportedMediaTypes() {
+		if info.MediaType == runtime.ContentTypeProtobuf {
+			continue
+		}
+		pss.accepts = append(pss.accepts, info)
+	}
+	return pss
+}
+
+func (pss *protocolShieldSerializers) SupportedMediaTypes() []runtime.SerializerInfo {
+	if pss == nil {
+		return nil
+	}
+	return pss.accepts
+}
+
+func (pss *protocolShieldSerializers) EncoderForVersion(encoder runtime.Encoder, gv runtime.GroupVersioner) runtime.Encoder {
+	if pss == nil {
+		return nil
+	}
+	return pss.CodecFactory.CodecForVersions(encoder, nil, gv, nil)
+}
+func (pss *protocolShieldSerializers) DecoderToVersion(decoder runtime.Decoder, gv runtime.GroupVersioner) runtime.Decoder {
+	if pss == nil {
+		return nil
+	}
+	return pss.CodecFactory.CodecForVersions(nil, decoder, nil, gv)
 }
