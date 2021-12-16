@@ -67,6 +67,8 @@ type StorageBuilder interface {
 	GetTriggerFuncs() storage.IndexerFuncs
 	GetSelectableFields(obj HasObjectMeta) fields.Set
 	BasicMatch(label labels.Selector, field fields.Selector) storage.SelectionPredicate
+	WarningsOnCreate(ctx context.Context, obj runtime.Object) []string
+	WarningsOnUpdate(ctx context.Context, obj, old runtime.Object) []string
 }
 
 // Deprecated
