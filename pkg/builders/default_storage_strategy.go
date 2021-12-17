@@ -140,6 +140,14 @@ func (b DefaultStorageStrategy) BasicMatch(label labels.Selector, field fields.S
 	}
 }
 
+func (*DefaultStorageStrategy) WarningsOnUpdate(ctx context.Context, obj, old runtime.Object) []string {
+	return nil
+}
+
+func (*DefaultStorageStrategy) WarningsOnCreate(ctx context.Context, obj runtime.Object) []string {
+	return nil
+}
+
 //
 // Status Strategies
 //

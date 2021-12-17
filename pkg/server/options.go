@@ -3,6 +3,9 @@ package apiserver
 import (
 	"crypto/tls"
 	"fmt"
+	"net/http"
+	"net/url"
+
 	"github.com/loft-sh/apiserver/pkg/admission"
 	"github.com/loft-sh/apiserver/pkg/apiserver"
 	"github.com/loft-sh/apiserver/pkg/builders"
@@ -23,8 +26,6 @@ import (
 	"k8s.io/klog"
 	aggregatorapiserver "k8s.io/kube-aggregator/pkg/apiserver"
 	openapi "k8s.io/kube-openapi/pkg/common"
-	"net/http"
-	"net/url"
 )
 
 type ServerOptions struct {
@@ -58,7 +59,7 @@ func (o *ServerOptions) GenericConfig(tweakConfig func(config *genericapiserver.
 		}
 
 		serviceResolver := buildServiceResolver(serverConfig.LoopbackClientConfig.Host, kubeInformerFactory)
-		pluginInitializers, admissionPostStartHook, err := admissionConfig.New(proxyTransport, serverConfig.EgressSelector, serviceResolver)
+		pluginInitializers, admissionPostStartHook, err := admissionConfig.New(proxyTransport, serverConfig.EgressSelector, serviceResolver, nil)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create admission plugin initializer: %v", err)
 		}
