@@ -103,6 +103,9 @@ type APIResource struct {
 	// This field is optional. The standard REST implementation will be used
 	// by default.
 	REST string
+	// StatusREST is the status rest.Storage implementation used to handle
+	// status requests.
+	StatusREST string
 	// Subresources is a map of subresources keyed by name
 	Subresources map[string]*APISubresource
 	// Type is the Type object from code-gen
@@ -207,6 +210,7 @@ func (b *APIsBuilder) ParseAPIs() {
 					Resource:       resource.Resource,
 					Type:           resource.Type,
 					REST:           resource.REST,
+					StatusREST:     resource.StatusREST,
 					Kind:           resource.Kind,
 					Subresources:   resource.Subresources,
 					StatusStrategy: resource.StatusStrategy,
@@ -271,6 +275,7 @@ func (b *APIsBuilder) ParseIndex() {
 
 		r.Resource = rt.Resource
 		r.REST = rt.REST
+		r.StatusREST = rt.StatusREST
 		r.ShortName = rt.ShortName
 
 		r.Strategy = rt.Strategy
@@ -364,10 +369,11 @@ func (b *APIsBuilder) GetNameAndImport(tags SubresourceTags) (string, string) {
 
 // ResourceTags contains the tags present in a "+resource=" comment
 type ResourceTags struct {
-	Resource  string
-	REST      string
-	Strategy  string
-	ShortName string
+	Resource   string
+	REST       string
+	StatusREST string
+	Strategy   string
+	ShortName  string
 }
 
 // ParseResourceTag parses the tags in a "+resource=" comment into a ResourceTags struct
@@ -384,6 +390,8 @@ func ParseResourceTag(tag string) ResourceTags {
 		switch kv[0] {
 		case "rest":
 			result.REST = value
+		case "statusRest":
+			result.StatusREST = value
 		case "path":
 			result.Resource = value
 		case "strategy":

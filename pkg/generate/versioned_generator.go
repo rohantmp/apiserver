@@ -83,6 +83,14 @@ var (
 			&{{ $api.Group }}.{{ $api.StatusStrategy }}{DefaultStatusStorageStrategy: builders.StatusStorageStrategySingleton},
 		),{{ end -}}
 
+		{{ if $api.StatusREST -}}
+		builders.NewApiResourceWithStorage(
+			{{ $api.Group }}.Internal{{ $api.Kind }}Status,
+			func() runtime.Object { return &{{ $api.Kind }}{} },     // Register versioned resource
+			func() runtime.Object { return &{{ $api.Kind }}List{} }, // Register versioned resource list
+			{{ $api.Group }}.New{{ $api.Kind }}StatusREST),
+		{{ end -}}
+
 		{{ range $subresource := $api.Subresources -}}
 		builders.NewApiResourceWithStorage(
 			{{ $api.Group }}.Internal{{ $subresource.Kind }}REST,
