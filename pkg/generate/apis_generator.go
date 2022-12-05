@@ -73,7 +73,8 @@ func GetAllApiBuilders() []*builders.APIGroupBuilder {
 }
 
 {{ range $group := .Groups -}}
-var {{ $group.Group }}ApiGroup = builders.NewApiGroupBuilder(
+func Get{{ $group.GroupTitle }}APIBuilder() *builders.APIGroupBuilder {
+	return builders.NewApiGroupBuilder(
 	"{{ $group.Group }}.{{ $group.Domain }}",
 	"{{ $group.PkgPath}}").
 	WithUnVersionedApi({{ $group.Group }}.ApiVersion).
@@ -91,9 +92,6 @@ var {{ $group.Group }}ApiGroup = builders.NewApiGroupBuilder(
 		{{ end -}}
 		{{ end -}}
 	)
-
-func Get{{ $group.GroupTitle }}APIBuilder() *builders.APIGroupBuilder {
-	return {{ $group.Group }}ApiGroup
 }
 {{ end -}}
 `

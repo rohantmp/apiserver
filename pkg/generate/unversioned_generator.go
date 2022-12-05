@@ -77,6 +77,12 @@ var (
 			return New{{ $api.REST }}Func()
 		}
 		New{{ $api.REST }}Func NewRESTFunc
+		{{ if $api.StatusREST -}}
+		New{{ $api.StatusREST }} = func(getter generic.RESTOptionsGetter) rest.Storage {
+			return New{{ $api.StatusREST }}Func()
+		}
+		New{{ $api.StatusREST }}Func NewRESTFunc
+		{{ end -}}
 	{{ else -}}
 		{{$api.Group|public}}{{$api.Kind}}Storage = builders.NewApiResource( // Resource status endpoint
 			Internal{{ $api.Kind }},
