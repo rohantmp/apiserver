@@ -57,7 +57,7 @@ func StartAPIServer(opts *StartOptions) error {
 	}
 
 	cmd, _ := newAPIServerCommand(opts, opts.StopChan)
-	if opts.DisableCommandFlags == false {
+	if !opts.DisableCommandFlags {
 		cmd.Flags().AddFlagSet(pflag.CommandLine)
 	}
 	if err := cmd.Execute(); err != nil {

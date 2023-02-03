@@ -9,6 +9,7 @@ import (
 	"github.com/loft-sh/apiserver/pkg/admission"
 	"github.com/loft-sh/apiserver/pkg/apiserver"
 	"github.com/loft-sh/apiserver/pkg/builders"
+	oteltrace "go.opentelemetry.io/otel/trace"
 	utilnet "k8s.io/apimachinery/pkg/util/net"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/version"
@@ -51,7 +52,7 @@ func (o *ServerOptions) GenericConfig(tweakConfig func(config *genericapiserver.
 	}
 
 	// admission webhooks
-	if o.DisableWebhooks == false && serverConfig.LoopbackClientConfig != nil {
+	if !o.DisableWebhooks && serverConfig.LoopbackClientConfig != nil {
 		proxyTransport := createNodeDialer()
 		admissionConfig := &admission.Config{
 			ExternalInformers:    kubeInformerFactory,
@@ -59,7 +60,8 @@ func (o *ServerOptions) GenericConfig(tweakConfig func(config *genericapiserver.
 		}
 
 		serviceResolver := buildServiceResolver(serverConfig.LoopbackClientConfig.Host, kubeInformerFactory)
-		pluginInitializers, admissionPostStartHook, err := admissionConfig.New(proxyTransport, serverConfig.EgressSelector, serviceResolver, &serverConfig.TracerProvider)
+		tp := oteltrace.NewNoopTracerProvider()
+		pluginInitializers, admissionPostStartHook, err := admissionConfig.New(proxyTransport, serverConfig.EgressSelector, serviceResolver, &tp)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create admission plugin initializer: %v", err)
 		}
