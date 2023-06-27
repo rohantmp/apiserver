@@ -22,7 +22,7 @@ import (
 	"runtime"
 
 	"k8s.io/gengo/args"
-	"k8s.io/klog"
+	"k8s.io/klog/v2"
 )
 
 func main() {
