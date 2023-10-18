@@ -20,6 +20,7 @@ import (
 	genericoptions "k8s.io/apiserver/pkg/server/options"
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
 	"k8s.io/apiserver/pkg/util/webhook"
+	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -69,10 +70,20 @@ func (o *ServerOptions) GenericConfig(tweakConfig func(config *genericapiserver.
 			return nil, err
 		}
 
+		kubeClient, err := kubernetes.NewForConfig(serverConfig.LoopbackClientConfig)
+		if err != nil {
+			return nil, err
+		}
+		dynamicClient, err := dynamic.NewForConfig(serverConfig.LoopbackClientConfig)
+		if err != nil {
+			return nil, err
+		}
+
 		err = o.RecommendedOptions.Admission.ApplyTo(
 			&serverConfig.Config,
 			kubeInformerFactory,
-			serverConfig.LoopbackClientConfig,
+			kubeClient,
+			dynamicClient,
 			utilfeature.DefaultFeatureGate,
 			pluginInitializers...)
 		if err != nil {
