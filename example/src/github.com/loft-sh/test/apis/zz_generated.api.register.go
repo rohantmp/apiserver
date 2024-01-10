@@ -25,17 +25,15 @@ func GetAllApiBuilders() []*builders.APIGroupBuilder {
 	}
 }
 
-var testApiGroup = builders.NewApiGroupBuilder(
-	"test.loft.sh",
-	"github.com/loft-sh/test/apis/test").
-	WithUnVersionedApi(test.ApiVersion).
-	WithVersionedApis(
-		testv1.ApiVersion,
-	).
-	WithRootScopedKinds(
-		"ClusterRole",
-	)
-
 func GetTestAPIBuilder() *builders.APIGroupBuilder {
-	return testApiGroup
+	return builders.NewApiGroupBuilder(
+		"test.loft.sh",
+		"github.com/loft-sh/test/apis/test").
+		WithUnVersionedApi(test.ApiVersion).
+		WithVersionedApis(
+			testv1.ApiVersion,
+		).
+		WithRootScopedKinds(
+			"ClusterRole",
+		)
 }

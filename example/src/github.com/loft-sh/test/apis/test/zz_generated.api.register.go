@@ -86,7 +86,6 @@ type ClusterRoleSpec struct {
 type ClusterRoleStatus struct {
 }
 
-//
 // ClusterRole Functions and Structs
 //
 // +k8s:deepcopy-gen=false

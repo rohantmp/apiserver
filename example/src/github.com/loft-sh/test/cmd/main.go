@@ -22,11 +22,8 @@ import (
 	"github.com/loft-sh/test/apis/test"
 	testv1 "github.com/loft-sh/test/apis/test/v1"
 	"github.com/loft-sh/test/pkg/openapi"
-	apiregistrationv1 "k8s.io/kube-aggregator/pkg/apis/apiregistration/v1"
-	"math/rand"
-	"time"
-
 	_ "github.com/loft-sh/test/pkg/registry"
+	apiregistrationv1 "k8s.io/kube-aggregator/pkg/apis/apiregistration/v1"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
@@ -55,8 +52,6 @@ func init() {
 }
 
 func main() {
-	rand.Seed(time.Now().UnixNano())
-
 	// Start the api server
 	err := apiserver.StartAPIServer(&apiserver.StartOptions{
 		Apis:                  apis.GetAllApiBuilders(),
