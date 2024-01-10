@@ -2,6 +2,7 @@ package registry
 
 import (
 	"context"
+
 	"github.com/loft-sh/test/apis/test"
 	testv1 "github.com/loft-sh/test/apis/test/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -27,6 +28,8 @@ type REST struct {
 func (r *REST) New() runtime.Object {
 	return &testv1.ClusterRole{}
 }
+
+func (r *REST) Destroy() {}
 
 func (r *REST) NamespaceScoped() bool {
 	return false
