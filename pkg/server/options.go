@@ -51,6 +51,10 @@ func (o *ServerOptions) GenericConfig(tweakConfig func(config *genericapiserver.
 		serverConfig.LoopbackClientConfig = loopbackKubeConfig
 		serverConfig.SharedInformerFactory = kubeInformerFactory
 	}
+	kubeClient, err := kubernetes.NewForConfig(serverConfig.LoopbackClientConfig)
+	if err != nil {
+		return nil, err
+	}
 
 	// admission webhooks
 	if !o.DisableWebhooks && serverConfig.LoopbackClientConfig != nil {
@@ -70,10 +74,6 @@ func (o *ServerOptions) GenericConfig(tweakConfig func(config *genericapiserver.
 			return nil, err
 		}
 
-		kubeClient, err := kubernetes.NewForConfig(serverConfig.LoopbackClientConfig)
-		if err != nil {
-			return nil, err
-		}
 		dynamicClient, err := dynamic.NewForConfig(serverConfig.LoopbackClientConfig)
 		if err != nil {
 			return nil, err
@@ -102,7 +102,9 @@ func (o *ServerOptions) GenericConfig(tweakConfig func(config *genericapiserver.
 				&serverConfig.Config,
 			)
 		},
-		o.RecommendedOptions.Features.ApplyTo,
+		func(c *genericapiserver.Config) error {
+			return o.RecommendedOptions.Features.ApplyTo(c, kubeClient, kubeInformerFactory)
+		},
 	)
 	if err != nil {
 		return nil, err
