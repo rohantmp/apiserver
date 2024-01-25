@@ -170,7 +170,7 @@ type {{ $a.Name }} {{ $a.UnderlyingTypeName }}
 
 type {{ $s.Name }} struct {
 {{ range $f := $s.Fields -}}
-    {{ $f.Name }} {{ $f.UnversionedType }}
+    {{ $f.Name }} {{ $f.UnversionedType }} {{ $f.Annotation }}
 {{ end -}}
 }
 {{ end -}}
@@ -193,18 +193,18 @@ type {{.StatusStrategy}} struct {
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 type {{$api.Kind}}List struct {
-	metav1.TypeMeta
-	metav1.ListMeta
-	Items []{{$api.Kind}}
+	metav1.TypeMeta ` + "`json:\",inline\"`" + `
+	metav1.ListMeta ` + "`json:\"metadata,omitempty\"`" + `
+	Items []{{$api.Kind}} ` + "`json:\"items\"`" + `
 }
 
 {{ range $subresource := $api.Subresources -}}
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 type {{$subresource.Request}}List struct {
-	metav1.TypeMeta
-	metav1.ListMeta
-	Items []{{$subresource.Request}}
+	metav1.TypeMeta ` + "`json:\",inline\"`" + `
+	metav1.ListMeta ` + "`json:\"metadata,omitempty\"`" + `
+	Items []{{$subresource.Request}} ` + "`json:\"items\"`" + `
 }
 {{ end -}}
 
