@@ -73,14 +73,14 @@ func Resource(resource string) schema.GroupResource {
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 type ClusterRole struct {
-	metav1.TypeMeta
-	metav1.ObjectMeta
-	Spec   ClusterRoleSpec
-	Status ClusterRoleStatus
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+	Spec              ClusterRoleSpec   `json:"spec,omitempty"`
+	Status            ClusterRoleStatus `json:"status,omitempty"`
 }
 
 type ClusterRoleSpec struct {
-	Rules []string
+	Rules []string `json:"rules"`
 }
 
 type ClusterRoleStatus struct {
@@ -101,9 +101,9 @@ type ClusterRoleStatusStrategy struct {
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 type ClusterRoleList struct {
-	metav1.TypeMeta
-	metav1.ListMeta
-	Items []ClusterRole
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []ClusterRole `json:"items"`
 }
 
 func (ClusterRole) NewStatus() interface{} {

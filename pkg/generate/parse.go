@@ -71,6 +71,7 @@ type Field struct {
 	// For versioned Kubernetes types, this is the unversioned package
 	UnversionedImport string
 	UnversionedType   string
+	Annotation        string
 }
 
 type APIVersion struct {
@@ -713,11 +714,17 @@ func (apigroup *APIGroup) DoType(t *types.Type) (*Struct, []*types.Type) {
 			memberName = ""
 		}
 
+		tags := ""
+		if member.Tags != "" {
+			tags = "`" + member.Tags + "`"
+		}
+
 		s.Fields = append(s.Fields, &Field{
 			Name:              memberName,
 			VersionedPackage:  member.Type.Name.Package,
 			UnversionedImport: uImport,
 			UnversionedType:   uType,
+			Annotation:        tags,
 		})
 
 		switch {
