@@ -24,10 +24,10 @@ import (
 	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/klog/v2"
 	aggregatorapiserver "k8s.io/kube-aggregator/pkg/apiserver"
 	openapi "k8s.io/kube-openapi/pkg/common"
+	ctrl "sigs.k8s.io/controller-runtime"
 )
 
 type ServerOptions struct {
@@ -157,18 +157,9 @@ func (o *ServerOptions) buildLoopback() (*rest.Config, informers.SharedInformerF
 	var loopbackConfig *rest.Config
 	var err error
 
-	if len(o.RecommendedOptions.CoreAPI.CoreAPIKubeconfigPath) == 0 {
-		klog.Infof("loading in-cluster loopback client...")
-		loopbackConfig, err = rest.InClusterConfig()
-		if err != nil {
-			return nil, nil, err
-		}
-	} else {
-		klog.Infof("loading out-of-cluster loopback client according to `--kubeconfig` settings...")
-		loopbackConfig, err = clientcmd.BuildConfigFromFlags("", o.RecommendedOptions.CoreAPI.CoreAPIKubeconfigPath)
-		if err != nil {
-			return nil, nil, err
-		}
+	loopbackConfig, err = ctrl.GetConfig()
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to get config: %w", err)
 	}
 
 	loopbackClient, err := kubernetes.NewForConfig(loopbackConfig)
