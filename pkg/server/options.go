@@ -56,6 +56,8 @@ func (o *ServerOptions) GenericConfig(tweakConfig func(config *genericapiserver.
 		return nil, err
 	}
 
+	_ = o.RecommendedOptions.Authorization.ApplyTo(&serverConfig.Authorization)
+
 	// admission webhooks
 	if !o.DisableWebhooks && serverConfig.LoopbackClientConfig != nil {
 		proxyTransport := createNodeDialer()
@@ -111,7 +113,6 @@ func (o *ServerOptions) GenericConfig(tweakConfig func(config *genericapiserver.
 	}
 
 	_ = o.RecommendedOptions.Authentication.ApplyTo(&serverConfig.Authentication, serverConfig.Config.SecureServing, serverConfig.Config.OpenAPIConfig)
-	_ = o.RecommendedOptions.Authorization.ApplyTo(&serverConfig.Authorization)
 	if tweakConfig != nil {
 		if err := tweakConfig(serverConfig); err != nil {
 			return nil, err

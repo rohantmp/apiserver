@@ -1,13 +1,13 @@
 package generate
 
 import (
+	"fmt"
 	"path"
 	"path/filepath"
 	"strings"
 
 	"k8s.io/klog/v2"
 
-	"github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/gengo/args"
 	"k8s.io/gengo/generator"
@@ -60,7 +60,7 @@ func (g *Gen) ParsePackages(context *generator.Context, arguments *args.Generato
 			unversionedPkgs.Insert(unversioned)
 
 			if apis := filepath.Dir(unversioned); apis != apisPkg && len(apisPkg) > 0 {
-				panic(errors.Errorf(
+				panic(fmt.Errorf(
 					"Found multiple apis directory paths: %v and %v", apisPkg, apis))
 			} else {
 				apisPkg = apis

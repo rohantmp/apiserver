@@ -1,13 +1,13 @@
 package generate
 
 import (
+	"errors"
 	"fmt"
 	"path"
 	"path/filepath"
 	"sort"
 	"strings"
 
-	"github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/gengo/args"
 	"k8s.io/gengo/generator"
@@ -449,7 +449,7 @@ func (b *APIsBuilder) GetResourceTag(c *types.Type) string {
 	if len(kbResource) != 0 {
 		return kbResource
 	}
-	panic(errors.Errorf("Must specify +resource or kubebuilder:resource comment for type %v", c.Name))
+	panic(fmt.Errorf("Must specify +resource or kubebuilder:resource comment for type %v", c.Name))
 }
 
 func (b *APIsBuilder) GenClient(c *types.Type) bool {
@@ -474,7 +474,7 @@ func (b *APIsBuilder) GetControllerTag(c *types.Type) string {
 	if len(kbController) != 0 {
 		return kbController
 	}
-	panic(errors.Errorf("Must specify +controller or +kubebuilder:controller comment for type %v", c.Name))
+	panic(fmt.Errorf("Must specify +controller or +kubebuilder:controller comment for type %v", c.Name))
 }
 
 func (b *APIsBuilder) GetSubresourceTags(c *types.Type) []string {
@@ -508,7 +508,7 @@ func (b *APIsBuilder) ParsePackages() {
 			b.UnversionedPkgs.Insert(unversioned)
 
 			if apis := filepath.Dir(unversioned); apis != b.APIsPkg && len(b.APIsPkg) > 0 {
-				panic(errors.Errorf(
+				panic(fmt.Errorf(
 					"Found multiple apis directory paths: %v and %v.  "+
 						"Do you have a +resource tag on a resource that is not in a version "+
 						"directory?", b.APIsPkg, apis))
@@ -524,7 +524,7 @@ func (b *APIsBuilder) ParseDomain() {
 	pkg := b.context.Universe[b.APIsPkg]
 	if pkg == nil {
 		// If the input had no Go files, for example.
-		panic(errors.Errorf("Missing apis package."))
+		panic(errors.New("Missing apis package."))
 	}
 	comments := Comments(pkg.Comments)
 	b.Domain = comments.GetTag("domain", "=")
@@ -674,7 +674,7 @@ func (apigroup *APIGroup) DoType(t *types.Type) (*Struct, []*types.Type) {
 
 							uType = prefix + uImportName + "." + name
 
-							//fmt.Printf("\nDifferent Parent Package: %s\nChild Package: %s\nKind: %s (Kind.String() %s)\nImport stmt: %s\nType: %s\n\n",
+							// fmt.Printf("\nDifferent Parent Package: %s\nChild Package: %s\nKind: %s (Kind.String() %s)\nImport stmt: %s\nType: %s\n\n",
 							//	pkg,
 							//	member.Type.Name.Package,
 							//	member.Type.Kind,
@@ -697,7 +697,7 @@ func (apigroup *APIGroup) DoType(t *types.Type) (*Struct, []*types.Type) {
 							// Create the field type name - should be <pkgalias>.<TypeName>
 							uType = uImportName + "." + name
 
-							//fmt.Printf("\nDifferent Parent Package: %s\nChild Package: %s\nKind: %s (Kind.String() %s)\nImport stmt: %s\nType: %s\n\n",
+							// fmt.Printf("\nDifferent Parent Package: %s\nChild Package: %s\nKind: %s (Kind.String() %s)\nImport stmt: %s\nType: %s\n\n",
 							//	pkg,
 							//	member.Type.Name.Package,
 							//	member.Type.Kind,

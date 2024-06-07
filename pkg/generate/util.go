@@ -5,8 +5,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/pkg/errors"
-
 	"k8s.io/gengo/types"
 )
 
@@ -74,7 +72,7 @@ func IsVersioned(t *types.Type, group string) bool {
 
 func GetVersion(t *types.Type, group string) string {
 	if !IsVersioned(t, group) {
-		panic(errors.Errorf("Cannot get version for unversioned type %v", t.Name))
+		panic(fmt.Errorf("Cannot get version for unversioned type %v", t.Name))
 	}
 	return filepath.Base(t.Name.Package)
 }
@@ -92,7 +90,7 @@ func GetGroupPackage(t *types.Type) string {
 
 func GetKind(t *types.Type, group string) string {
 	if !IsVersioned(t, group) && !IsUnversioned(t, group) {
-		panic(errors.Errorf("Cannot get kind for type not in group %v", t.Name))
+		panic(fmt.Errorf("Cannot get kind for type not in group %v", t.Name))
 	}
 	return t.Name.Name
 }

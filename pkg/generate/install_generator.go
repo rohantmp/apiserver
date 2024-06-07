@@ -2,9 +2,8 @@ package generate
 
 import (
 	"io"
-	"text/template"
-
 	"path"
+	"text/template"
 
 	"k8s.io/gengo/generator"
 )
