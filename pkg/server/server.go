@@ -113,7 +113,7 @@ func newAPIServerOptions(b []*builders.APIGroupBuilder) *ServerOptions {
 	// we don't use etcd
 	o.RecommendedOptions.Etcd = nil
 	o.RecommendedOptions.Admission = genericoptions.NewAdmissionOptions()
-	o.RecommendedOptions.Admission.DefaultOffPlugins = sets.String{lifecycle.PluginName: sets.Empty{}}
+	o.RecommendedOptions.Admission.DefaultOffPlugins = sets.Set[string]{lifecycle.PluginName: sets.Empty{}}
 
 	o.RecommendedOptions.Authorization.RemoteKubeConfigFileOptional = true
 	o.RecommendedOptions.Authentication.RemoteKubeConfigFileOptional = true
