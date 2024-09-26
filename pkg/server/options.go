@@ -19,6 +19,7 @@ import (
 	genericfilters "k8s.io/apiserver/pkg/server/filters"
 	genericoptions "k8s.io/apiserver/pkg/server/options"
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
+	utilapiserverversion "k8s.io/apiserver/pkg/util/version"
 	"k8s.io/apiserver/pkg/util/webhook"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/informers"
@@ -128,9 +129,18 @@ func (o *ServerOptions) RunServer(APIServerVersion *version.Info, stopCh <-chan 
 		return err
 	}
 
+	// // set up version in ComponentGlobalsRegistry
+	// _, _ = utilapiserverversion.DefaultComponentGlobalsRegistry.ComponentGlobalsOrRegister(
+	// 	"loft-apiserver",
+	// 	utilapiserverversion.NewEffectiveVersion(APIServerVersion.String()),
+	// 	featuregate.NewVersionedFeatureGate(utilversion.MustParse(APIServerVersion.String())),
+	// )
+	// aggregatedAPIServerConfig.EffectiveVersion = utilapiserverversion.DefaultComponentGlobalsRegistry.EffectiveVersionFor("loft-apiserver")
+	aggregatedAPIServerConfig.EffectiveVersion = utilapiserverversion.NewEffectiveVersion(APIServerVersion.String())
+
 	// set the basics
 	genericConfig := &aggregatedAPIServerConfig.Config
-	genericConfig.Version = APIServerVersion
+	genericConfig.EffectiveVersion = aggregatedAPIServerConfig.EffectiveVersion
 	genericConfig.Authorization.Authorizer = authorizer
 
 	// set open api
