@@ -130,7 +130,6 @@ func (o *ServerOptions) RunServer(APIServerVersion *version.Info, stopCh <-chan 
 
 	// set the basics
 	genericConfig := &aggregatedAPIServerConfig.Config
-	genericConfig.Version = APIServerVersion
 	genericConfig.Authorization.Authorizer = authorizer
 
 	// set open api
