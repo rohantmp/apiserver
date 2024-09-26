@@ -110,8 +110,8 @@ require (
 )
 
 replace (
-	k8s.io/apiserver => github.com/loft-sh/k8s-apiserver v0.0.0-20240611090521-8094d3632b14
-	k8s.io/client-go => github.com/loft-sh/k8s-client-go v0.0.0-20240607110042-1adab8ec3fff
+	k8s.io/apiserver => ../k8s-apiserver
+	k8s.io/client-go => ../k8s-client-go
 	k8s.io/component-base v0.30.1 => k8s.io/component-base v0.0.0-20240611005304-e4e29391883e
 	sigs.k8s.io/controller-runtime v0.18.4 => sigs.k8s.io/controller-runtime v0.18.1-0.20240608161558-1f5b39fa59d1
 )
