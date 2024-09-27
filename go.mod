@@ -113,6 +113,6 @@ require (
 )
 
 replace (
-	k8s.io/apiserver => ../k8s-apiserver
-	k8s.io/client-go => ../k8s-client-go
+	k8s.io/apiserver => github.com/rohantmp/k8s-apiserver v1.31.0-test.0
+	k8s.io/client-go => github.com/rohantmp/k8s-client-go v1.31.0-test.0
 )
