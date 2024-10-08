@@ -28,7 +28,11 @@ import (
 	"k8s.io/apiserver/pkg/authorization/authorizer"
 	"k8s.io/klog/v2"
 
+	"k8s.io/apiserver/pkg/admission"
+	admissionmetrics "k8s.io/apiserver/pkg/admission/metrics"
 	"k8s.io/apiserver/pkg/admission/plugin/namespace/lifecycle"
+	mutatingwebhook "k8s.io/apiserver/pkg/admission/plugin/webhook/mutating"
+	validatingwebhook "k8s.io/apiserver/pkg/admission/plugin/webhook/validating"
 	genericapiserver "k8s.io/apiserver/pkg/server"
 	genericoptions "k8s.io/apiserver/pkg/server/options"
 	"k8s.io/apiserver/pkg/util/feature"
@@ -112,7 +116,7 @@ func newAPIServerOptions(b []*builders.APIGroupBuilder) *ServerOptions {
 
 	// we don't use etcd
 	o.RecommendedOptions.Etcd = nil
-	o.RecommendedOptions.Admission = genericoptions.NewAdmissionOptions()
+	o.RecommendedOptions.Admission = NewAdmissionOptions()
 	o.RecommendedOptions.Admission.DefaultOffPlugins = sets.Set[string]{lifecycle.PluginName: sets.Empty{}}
 
 	o.RecommendedOptions.Authorization.RemoteKubeConfigFileOptional = true
@@ -128,4 +132,25 @@ func applyOptions(config *genericapiserver.Config, applyTo ...func(*genericapise
 	}
 
 	return nil
+}
+
+// NewAdmissionOptions creates a new instance of AdmissionOptions
+// Note:
+//
+//	In addition it calls RegisterAllAdmissionPlugins to register
+//	all generic admission plugins.
+func NewAdmissionOptions() *genericoptions.AdmissionOptions {
+	options := &genericoptions.AdmissionOptions{
+		Plugins:    admission.NewPlugins(),
+		Decorators: admission.Decorators{admission.DecoratorFunc(admissionmetrics.WithControllerMetrics)},
+		// This list is mix of mutating admission plugins and validating
+		// admission plugins. The apiserver always runs the validating ones
+		// after all the mutating ones, so their relative order in this list
+		// doesn't matter.
+		// We override this field to omit validatingadmsionpolicies
+		RecommendedPluginOrder: []string{lifecycle.PluginName, mutatingwebhook.PluginName, validatingwebhook.PluginName},
+		DefaultOffPlugins:      sets.Set[string]{},
+	}
+	genericapiserver.RegisterAllAdmissionPlugins(options.Plugins)
+	return options
 }
