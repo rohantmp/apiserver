@@ -113,6 +113,7 @@ require (
 )
 
 replace (
-	k8s.io/apiserver => github.com/loft-sh/k8s-apiserver v0.0.0-20240930111903-b81a21948d36
+	k8s.io/apiserver => github.com/loft-sh/k8s-apiserver v0.0.0-20240926084745-52e427627394
 	k8s.io/client-go => github.com/loft-sh/k8s-client-go v0.0.0-20240925114648-278d3e7dc510
+
 )
